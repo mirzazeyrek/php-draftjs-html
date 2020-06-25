@@ -1,0 +1,25 @@
+dist: xenial
+os: linux
+language: php
+
+# avoid double Travis build when the PR is created on upstream
+if: |
+    type = pull_request OR \
+    branch = master
+
+cache:
+    apt: true
+    directories:
+        - $HOME/.composer/cache/files
+
+jobs:
+    include:
+        - php: 7.2
+
+install:
+    - composer install --no-interaction --optimize-autoloader --no-progress --prefer-dist --no-suggest
+    - php vendor/bin/simple-phpunit install
+
+script:
+    - php vendor/bin/simple-phpunit -v
+    - php vendor/bin/php-cs-fixer fix --verbose --dry-run
