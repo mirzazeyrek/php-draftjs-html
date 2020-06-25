@@ -53,14 +53,11 @@ class StyleToCss
     ];
 
     /**
-     * Convert a style array to a string for an HTML attribute
-     *
-     * @param array $styleDescr
-     * @return string
+     * Convert a style array to a string for an HTML attribute.
      */
     public function convert(array $styleDescr): string
     {
-        return join('; ', array_map(function ($key) use ($styleDescr) {
+        return implode('; ', array_map(function ($key) use ($styleDescr) {
             $styleValue = $this->processStyleValue($key, $styleDescr[$key]);
             $styleName = $this->processStyleName($key);
 
@@ -68,14 +65,9 @@ class StyleToCss
         }, array_keys($styleDescr)));
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @return string
-     */
     protected function processStyleValue(string $key, string $value): string
     {
-        if (! \is_numeric($value) || $value === '0' || ! empty($this->unitlessNumbers[$key])) {
+        if (!is_numeric($value) || '0' === $value || !empty($this->unitlessNumbers[$key])) {
             return $value;
         } else {
             return $value . 'px';
@@ -83,10 +75,7 @@ class StyleToCss
     }
 
     /**
-     * Based on https://github.com/facebook/react/blob/master/src/renderers/dom/shared/CSSPropertyOperations.js
-     *
-     * @param string $name
-     * @return string
+     * Based on https://github.com/facebook/react/blob/master/src/renderers/dom/shared/CSSPropertyOperations.js.
      */
     protected function processStyleName(string $name): string
     {

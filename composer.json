@@ -2,9 +2,6 @@
     "name": "willtj/php-draftjs-html",
     "description": "Export Draft.js ContentState to HTML",
     "type": "library",
-    "require-dev": {
-        "phpunit/phpunit": "^8.4"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +9,17 @@
             "email": "will.taylorjackson@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">= 7.2",
+        "ext-xml": "*",
+        "prezly/draft-php": "^1.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "symfony/phpunit-bridge": "^5.1"
+    },
     "autoload": {
         "psr-4": {
             "Willtj\\PhpDraftjsHtml\\": "src/"
@@ -23,8 +30,7 @@
             "Willtj\\PhpDraftjsHtml\\": "tests/"
         }
     },
-    "require": {
-        "ext-xml": "*",
-        "prezly/draft-php": "^1.1"
+    "config": {
+        "sort-packages": true
     }
 }

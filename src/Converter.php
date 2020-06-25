@@ -60,7 +60,7 @@ class Converter
         self::INLINE_STYLE_ITALIC,
         self::INLINE_STYLE_UNDERLINE,
         self::INLINE_STYLE_STRIKETHROUGH,
-        self::INLINE_STYLE_CODE
+        self::INLINE_STYLE_CODE,
     ];
 
     // Map entity data to element attributes.
@@ -117,10 +117,6 @@ class Converter
      */
     protected $styleToCss;
 
-    /**
-     * @param  ContentState $state
-     * @return self
-     */
     public function setState(ContentState $state): self
     {
         $this->state = $state;
@@ -129,15 +125,14 @@ class Converter
     }
 
     /**
-     * Update styles in the map by passing an array like ['BOLD' => ['element' => 'b']]
+     * Update styles in the map by passing an array like ['BOLD' => ['element' => 'b']].
      *
      * @param array $properties
-     * @return self
      */
     public function updateStyleMap(array $styleMap): self
     {
         foreach ($styleMap as $style => $properties) {
-            if (! array_key_exists($style, $this->styleMap)) {
+            if (!\array_key_exists($style, $this->styleMap)) {
                 $this->styleOrder[] = $style;
             }
 
@@ -148,17 +143,15 @@ class Converter
     }
 
     /**
-     * Convert the state to an HTML string
-     *
-     * @return string
+     * Convert the state to an HTML string.
      */
     public function toHtml(): string
     {
-        if (! $this->state) {
+        if (!$this->state) {
             return '';
         }
 
-        $this->doc = new DOMDocument;
+        $this->doc = new DOMDocument();
         $rootElement = $this->doc->createElement('div');
         $this->doc->appendChild($rootElement);
         $this->currentContainer = $rootElement;
@@ -177,10 +170,7 @@ class Converter
     }
 
     /**
-     * Convert a single block to an HTML string
-     *
-     * @param ContentBlock $block
-     * @return void
+     * Convert a single block to an HTML string.
      */
     protected function processBlock(ContentBlock $block): void
     {
@@ -208,10 +198,6 @@ class Converter
         $this->currentContainer->appendChild($element);
     }
 
-    /**
-     * @param ContentBlock $block
-     * @return DOMElement
-     */
     protected function createElementForBlock(ContentBlock $block): DOMElement
     {
         $attributes = $this->getBlockAttributes($block);
@@ -242,14 +228,9 @@ class Converter
         return $this->renderBlockContent($block, $rootElement);
     }
 
-    /**
-     * @param ContentBlock $block
-     * @param DOMElement $element
-     * @return DOMElement
-     */
     protected function renderBlockContent(ContentBlock $block, DOMElement $element): DOMElement
     {
-        if ($block->text === '') {
+        if ('' === $block->text) {
             // Prevent element collapse if completely empty.
             return self::BREAK_LINE;
         }
@@ -268,11 +249,11 @@ class Converter
 
                 foreach (array_reverse($this->styleOrder) as $styleName) {
                     // If our block type is CODE then don't wrap inline code elements.
-                    if ($styleName === self::INLINE_STYLE_CODE && $block->type === self::BLOCK_TYPE_CODE) {
+                    if (self::INLINE_STYLE_CODE === $styleName && self::BLOCK_TYPE_CODE === $block->type) {
                         continue;
                     }
 
-                    if ($styleSet && in_array($styleName, $styleSet)) {
+                    if ($styleSet && \in_array($styleName, $styleSet, true)) {
                         $inlineStyle = $this->styleMap[$styleName];
                         $tag = $inlineStyle['element'] ?? 'span';
 
@@ -293,8 +274,8 @@ class Converter
                     }
                 }
 
-                if ($numStyleNodes = count($styleNodes)) {
-                    for ($i = 0; $i < $numStyleNodes - 1; $i++) {
+                if ($numStyleNodes = \count($styleNodes)) {
+                    for ($i = 0; $i < $numStyleNodes - 1; ++$i) {
                         $styleNodes[$i]->appendChild($styleNodes[$i + 1]);
                         $node = $styleNodes[$i];
                     }
@@ -325,11 +306,6 @@ class Converter
         return $element;
     }
 
-    /**
-     * @param string $text
-     * @param array $characterMetaList
-     * @return array
-     */
     protected function getEntityRanges(string $text, array $characterMetaList): array
     {
         $charEntity = null;
@@ -337,7 +313,7 @@ class Converter
         $ranges = [];
         $rangeStart = 0;
 
-        foreach (\str_split($text) as $i => $char) {
+        foreach (str_split($text) as $i => $char) {
             $prevCharEntity = $charEntity;
 
             $meta = $characterMetaList[$i] ?? null;
@@ -347,9 +323,9 @@ class Converter
                 $ranges[] = [
                     'key' => $prevCharEntity,
                     'styleRanges' => $this->getStyleRanges(
-                        \substr($text, $rangeStart, $i - $rangeStart),
-                        array_slice($characterMetaList, $rangeStart, $i - $rangeStart)
-                    )
+                        substr($text, $rangeStart, $i - $rangeStart),
+                        \array_slice($characterMetaList, $rangeStart, $i - $rangeStart)
+                    ),
                 ];
 
                 $rangeStart = $i;
@@ -358,17 +334,12 @@ class Converter
 
         $ranges[] = [
             'key' => $charEntity,
-            'styleRanges' => $this->getStyleRanges(substr($text, $rangeStart), array_slice($characterMetaList, $rangeStart)),
+            'styleRanges' => $this->getStyleRanges(substr($text, $rangeStart), \array_slice($characterMetaList, $rangeStart)),
         ];
 
         return $ranges;
     }
 
-    /**
-     * @param string $text
-     * @param array $charMetaList
-     * @return array
-     */
     protected function getStyleRanges(string $text, array $charMetaList): array
     {
         $charStyle = [];
@@ -376,7 +347,7 @@ class Converter
         $ranges = [];
         $rangeStart = 0;
 
-        foreach (\str_split($text) as $i => $char) {
+        foreach (str_split($text) as $i => $char) {
             $prevCharStyle = $charStyle;
             $meta = $charMetaList[$i] ?? null;
             $charStyle = $meta ? $meta->style : [];
@@ -384,7 +355,7 @@ class Converter
             if ($i > 0 && $charStyle !== $prevCharStyle) {
                 $ranges[] = [
                     'text' => substr($text, $rangeStart, $i - $rangeStart),
-                    'styles' => $prevCharStyle
+                    'styles' => $prevCharStyle,
                 ];
 
                 $rangeStart = $i;
@@ -393,17 +364,12 @@ class Converter
 
         $ranges[] = [
             'text' => substr($text, $rangeStart),
-            'styles' => $charStyle
+            'styles' => $charStyle,
         ];
 
         return $ranges;
     }
 
-    /**
-     * @param EntityInstance $entity
-     * @param array $childNodes
-     * @return DOMElement|null
-     */
     protected function buildEntityElement(EntityInstance $entity, array $childNodes): ?DOMElement
     {
         $attributes = $this->getEntityAttributes($entity);
@@ -433,20 +399,16 @@ class Converter
         return $element;
     }
 
-    /**
-     * @param EntityInstance $entity
-     * @return array
-     */
     protected function getEntityAttributes(EntityInstance $entity): array
     {
         $attributes = [];
 
-        if (! $attributesMap = $this->allowedAttributes[$entity->type]) {
+        if (!$attributesMap = $this->allowedAttributes[$entity->type]) {
             return $attributes;
         }
 
         foreach ($entity->data as $key => $value) {
-            if (isset($value) && array_key_exists($key, $attributesMap)) {
+            if (isset($value) && \array_key_exists($key, $attributesMap)) {
                 $attribute = $attributesMap[$key];
                 $attributes[$attribute] = $value;
             } elseif ($this->isDataAttribute($key)) {
@@ -459,9 +421,6 @@ class Converter
 
     /**
      * Prevent leading/trailing/consecutive whitespace collapse.
-     *
-     * @param string $text
-     * @return string
      */
     protected function preserveWhitespace(string $text): string
     {
@@ -469,8 +428,8 @@ class Converter
         $newText = '';
 
         foreach (str_split($text) as $i => $char) {
-            if ($char=== ' ' &&
-                ($i === 0 || $i === $length - 1 || substr($text, $i - 1, 1) === ' ')
+            if (' ' === $char &&
+                (0 === $i || $i === $length - 1 || ' ' === substr($text, $i - 1, 1))
             ) {
                 $newText .= '\xA0';
             } else {
@@ -481,37 +440,26 @@ class Converter
         return $newText;
     }
 
-    /**
-     * @param array $styles
-     * @return string
-     */
     protected function styleToCss(array $styles): string
     {
-        if (! isset($this->styleToCss)) {
-            $this->styleToCss = new StyleToCss;
+        if (!isset($this->styleToCss)) {
+            $this->styleToCss = new StyleToCss();
         }
 
         return $this->styleToCss->convert($styles);
     }
 
     /**
-     * Get attributes that should be applied to the given block
-     *
-     * @param ContentBlock $block
-     * @return array
+     * Get attributes that should be applied to the given block.
      */
     protected function getBlockAttributes(ContentBlock $block): array
     {
         return [];
     }
 
-    /**
-     * @param array $attributes
-     * @return array
-     */
     protected function normalizeAttributes(array $attributes): array
     {
-        if (! $attributes) {
+        if (!$attributes) {
             return $attributes;
         }
 
@@ -528,10 +476,6 @@ class Converter
         return $normalized;
     }
 
-    /**
-     * @param string $blockType
-     * @return boolean
-     */
     protected function canHaveDepth(string $blockType): bool
     {
         switch ($blockType) {
@@ -543,43 +487,27 @@ class Converter
         }
     }
 
-    /**
-     * @param string $attribute
-     * @return boolean
-     */
     protected function isDataAttribute(string $attribute): bool
     {
-        return (bool) \preg_match(self::DATA_ATTRIBUTE, $attribute);
+        return (bool) preg_match(self::DATA_ATTRIBUTE, $attribute);
     }
 
-    /**
-     * @param string $text
-     * @return string
-     */
     protected function encodeContent(string $text): string
     {
-        return \str_replace(
+        return str_replace(
             ['&', '<', '>', '\xA0', '\n'],
             ['&amp;', '&lt;', '&gt;', '&nbsp;', self::BREAK_LINE . '\n'],
             $text
         );
     }
 
-    /**
-     * @param DOMNode $node
-     * @param array $styleSet
-     * @return DOMNode
-     */
     protected function addCustomInlineStyles(DOMNode $node, array $styleSet): DOMNode
     {
         return $node;
     }
 
     /**
-     * Get HTML tags that the given block type should be converted to
-     *
-     * @param string $blockType
-     * @return array
+     * Get HTML tags that the given block type should be converted to.
      */
     protected function getTagsForBlock(string $blockType): array
     {
@@ -606,15 +534,12 @@ class Converter
             case self::BLOCK_TYPE_ATOMIC:
                 return ['figure'];
             default:
-                return $this->defaultBlockTag === null ? [] : [$this->defaultBlockTag];
+                return null === $this->defaultBlockTag ? [] : [$this->defaultBlockTag];
         }
     }
 
     /**
-     * Get the tag that should be used to wrap the given block type
-     *
-     * @param string $blockType
-     * @return string|null
+     * Get the tag that should be used to wrap the given block type.
      */
     protected function getWrapperTag(string $blockType): ?string
     {
