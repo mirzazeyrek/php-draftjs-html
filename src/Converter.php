@@ -29,7 +29,7 @@ class Converter
     const ENTITY_TYPE_IMAGE = 'IMAGE';
     const ENTITY_TYPE_EMBED = 'embed';
 
-    const BREAK = '<br>';
+    const BREAK_LINE = '<br>';
     const DATA_ATTRIBUTE = '/^data-([a-z0-9-]+)$/';
 
     const ATTR_NAME_MAP = [
@@ -251,7 +251,7 @@ class Converter
     {
         if ($block->text === '') {
             // Prevent element collapse if completely empty.
-            return self::BREAK;
+            return self::BREAK_LINE;
         }
 
         $entityRanges = $this->getEntityRanges($this->preserveWhitespace($block->text), $block->characterList);
@@ -279,7 +279,7 @@ class Converter
                         // Normalize `className` -> `class`, etc.
                         $attributes = $this->normalizeAttributes($inlineStyle['attributes'] ?? []);
 
-                        if ($inlineStyle['style']) {
+                        if (isset($inlineStyle['style']) && !empty($inlineStyle['style'])) {
                             $attributes['style'] = $this->styleToCss((array) $inlineStyle['style']);
                         }
 
@@ -348,7 +348,7 @@ class Converter
                     'key' => $prevCharEntity,
                     'styleRanges' => $this->getStyleRanges(
                         \substr($text, $rangeStart, $i - $rangeStart),
-                        array_slice($charMetaList, $rangeStart, $i - $rangeStart)
+                        array_slice($characterMetaList, $rangeStart, $i - $rangeStart)
                     )
                 ];
 
@@ -560,7 +560,7 @@ class Converter
     {
         return \str_replace(
             ['&', '<', '>', '\xA0', '\n'],
-            ['&amp;', '&lt;', '&gt;', '&nbsp;', self::BREAK . '\n'],
+            ['&amp;', '&lt;', '&gt;', '&nbsp;', self::BREAK_LINE . '\n'],
             $text
         );
     }
