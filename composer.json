@@ -1,5 +1,5 @@
 {
-    "name": "willtj/php-draftjs-html",
+    "name": "20minutes/php-draftjs-html",
     "description": "Export Draft.js ContentState to HTML",
     "type": "library",
     "license": "MIT",
