@@ -231,8 +231,9 @@ class Converter
     protected function renderBlockContent(ContentBlock $block, DOMElement $element): DOMElement
     {
         if ('' === $block->text) {
-            // Prevent element collapse if completely empty.
-            return self::BREAK_LINE;
+            $element->appendChild($this->doc->createElement('br'));
+
+            return $element;
         }
 
         $entityRanges = $this->getEntityRanges($this->preserveWhitespace($block->text), $block->characterList);
