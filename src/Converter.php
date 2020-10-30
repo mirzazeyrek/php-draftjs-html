@@ -314,7 +314,7 @@ class Converter
         $ranges = [];
         $rangeStart = 0;
 
-        foreach (str_split($text) as $i => $char) {
+        foreach (mb_str_split($text, 1, 'UTF-8') as $i => $char) {
             $prevCharEntity = $charEntity;
 
             $meta = $characterMetaList[$i] ?? null;
@@ -324,7 +324,7 @@ class Converter
                 $ranges[] = [
                     'key' => $prevCharEntity,
                     'styleRanges' => $this->getStyleRanges(
-                        substr($text, $rangeStart, $i - $rangeStart),
+                        mb_substr($text, $rangeStart, $i - $rangeStart),
                         \array_slice($characterMetaList, $rangeStart, $i - $rangeStart)
                     ),
                 ];
@@ -335,7 +335,7 @@ class Converter
 
         $ranges[] = [
             'key' => $charEntity,
-            'styleRanges' => $this->getStyleRanges(substr($text, $rangeStart), \array_slice($characterMetaList, $rangeStart)),
+            'styleRanges' => $this->getStyleRanges(mb_substr($text, $rangeStart), \array_slice($characterMetaList, $rangeStart)),
         ];
 
         return $ranges;
@@ -348,14 +348,13 @@ class Converter
         $ranges = [];
         $rangeStart = 0;
 
-        foreach (str_split($text) as $i => $char) {
+        foreach (mb_str_split($text, 1, 'UTF-8') as $i => $char) {
             $prevCharStyle = $charStyle;
             $meta = $charMetaList[$i] ?? null;
             $charStyle = $meta ? $meta->style : [];
-
             if ($i > 0 && $charStyle !== $prevCharStyle) {
                 $ranges[] = [
-                    'text' => substr($text, $rangeStart, $i - $rangeStart),
+                    'text' => mb_substr($text, $rangeStart, $i - $rangeStart, 'UTF-8'),
                     'styles' => $prevCharStyle,
                 ];
 
@@ -364,7 +363,7 @@ class Converter
         }
 
         $ranges[] = [
-            'text' => substr($text, $rangeStart),
+            'text' => mb_substr($text, $rangeStart, null, 'UTF-8'),
             'styles' => $charStyle,
         ];
 
