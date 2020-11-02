@@ -120,6 +120,11 @@ class ConverterTest extends TestCase
                 '{"entityMap":{},"blocks":[{"data": {}, "key":"33nh8","text":"An ordered list:","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[]},{"data":{},"key":"8kinl","text":"One","type":"ordered-list-item","depth":0,"inlineStyleRanges":[],"entityRanges":[]},{"data":{},"key":"ekll4","text":"Two","type":"ordered-list-item","depth":0,"inlineStyleRanges":[],"entityRanges":[]}]}',
                 '<p>An ordered list:</p><ol><li>One</li><li>Two</li></ol>',
             ],
+            // Style with accents
+            [
+                '{"entityMap":{},"blocks":[{"depth":0,"data":{},"inlineStyleRanges":[{"offset":23,"length":5,"style":"BOLD"}],"text":"Testé avec dès accents Texte 1","type":"unstyled","key":"9lnff","entityRanges":[]}]}',
+                '<p>Testé avec dès accents <strong>Texte</strong> 1</p>',
+            ],
         ];
     }
 
