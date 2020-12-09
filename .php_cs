@@ -14,6 +14,9 @@ return PhpCsFixer\Config::create()
         'array_syntax' => [
             'syntax' => 'short'
         ],
+        'php_unit_method_casing' => [
+            'case' => 'snake_case'
+        ]
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
