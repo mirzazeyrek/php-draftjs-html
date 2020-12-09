@@ -324,7 +324,7 @@ class Converter
                 $ranges[] = [
                     'key' => $prevCharEntity,
                     'styleRanges' => $this->getStyleRanges(
-                        mb_substr($text, $rangeStart, $i - $rangeStart),
+                        mb_substr($text, $rangeStart, $i - $rangeStart, 'UTF-8'),
                         \array_slice($characterMetaList, $rangeStart, $i - $rangeStart)
                     ),
                 ];
@@ -335,7 +335,7 @@ class Converter
 
         $ranges[] = [
             'key' => $charEntity,
-            'styleRanges' => $this->getStyleRanges(mb_substr($text, $rangeStart), \array_slice($characterMetaList, $rangeStart)),
+            'styleRanges' => $this->getStyleRanges(mb_substr($text, $rangeStart, null, 'UTF-8'), \array_slice($characterMetaList, $rangeStart)),
         ];
 
         return $ranges;
@@ -431,7 +431,7 @@ class Converter
             if (' ' === $char &&
                 (0 === $i || $i === $length - 1 || ' ' === substr($text, $i - 1, 1))
             ) {
-                $newText .= '\xA0';
+                $newText .= utf8_encode("\xA0");
             } else {
                 $newText .= $char;
             }
@@ -495,8 +495,8 @@ class Converter
     protected function encodeContent(string $text): string
     {
         return str_replace(
-            ['&', '<', '>', '\xA0', '\n'],
-            ['&amp;', '&lt;', '&gt;', '&nbsp;', self::BREAK_LINE . '\n'],
+            ['\n'],
+            [self::BREAK_LINE . '\n'],
             $text
         );
     }
