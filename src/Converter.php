@@ -169,25 +169,36 @@ class Converter
         return implode('', $output);
     }
 
+
     /**
      * Convert a single block to an HTML string.
      */
     protected function processBlock(ContentBlock $block): void
     {
         $newWrapperTag = $this->getWrapperTag($block->type);
-
-        if ($newWrapperTag && ($this->currentContainer->nodeName !== $newWrapperTag || $block->depth > $this->currentDepth)) {
+        if (!$this->canHaveDepth($block->type)) {
+            //If the item can't have depth (e.g. isn't in a list). We need to go to the 
+            //base container as we are not in a list.
+            $this->currentContainer = $this->doc->documentElement;
+        } elseif ($newWrapperTag && ($this->currentContainer->nodeName !== $newWrapperTag || $block->depth > $this->currentDepth)) {
+            // If we are in a list and are changing list types or going deeper, we need a new container.
             $wrapperElement = $this->doc->createElement($newWrapperTag);
             $wrapperElement->isWrapper = true;
 
             if ($block->depth > $this->currentDepth) {
+                // If we are going deeper, we need to append the new container to the last child of the current container.
+                // e.g. if we are in an unordered list and we are going from a depth of 1 to 2, we need to append the new
+                // container to the last list item. ul > li > ul > li
                 $this->currentContainer->lastChild->appendChild($wrapperElement);
             } else {
-                $this->currentContainer->appendChild($wrapperElement);
+                // Otherwise we must be changing list types, so we need to append the new container to the 
+                //root of the document.
+                $this->doc->documentElement->appendChild($wrapperElement);
             }
 
             $this->currentContainer = $wrapperElement;
         } elseif ($block->depth < $this->currentDepth) {
+            // We're still in a list but we need to move up the tree.
             $this->currentContainer = $this->currentContainer->parentNode->parentNode;
         }
 
